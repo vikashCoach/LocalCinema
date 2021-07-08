@@ -1,2 +1,2 @@
-# LocalCinema.WebApi
+# LocalCinema
 DotNet Core Web API
