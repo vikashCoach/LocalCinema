@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using LocalCinema.Core.Services;
+using LocalCinema.Core.Services.Interfaces;
+using LocalCinema.Data.Model;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -26,7 +29,17 @@ namespace LocalCinema.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<KeyManager>(Configuration.GetSection("KeyManager"));
 
+            var keyManager = new KeyManager
+            {
+                AccessToken = Configuration.GetSection("KeyManager:AccessToken").Value,
+                Uri = Configuration.GetSection("KeyManager:Uri").Value
+            };
+            Configuration.Bind("KeyManager", keyManager); //inject values from appsettings; it could also be from s3/vault
+            services.AddSingleton(keyManager);
+
+            services.AddHttpClient<ICinemaCatalogManger,CinemaCatalogManager>();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
