@@ -7,26 +7,37 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using System.Linq;
 using LocalCinema.Data.Repository.Interfaces;
+using System.Net.Http;
+using Microsoft.Extensions.Options;
 
 namespace LocalCinema.Core.Services
 {
     public class CinemaCatalogManager : ICinemaCatalogManger
     {
-        private readonly ICinemaCatalogManger _cinemaCatalogManger;
+        private readonly ILocalCinemaRepo _localCinemaRepo;
 
         private readonly ILogger _logger;
 
+        private readonly HttpClient _httpClient;
+
         private readonly IUnitOfWork _unitOfWork;
-        public CinemaCatalogManager(ILogger<CinemaCatalogManager> logger, ICinemaCatalogManger cinemaCatalogManger, IUnitOfWork unitOfWork)
+
+        private readonly KeyManager _keyManager;
+        public CinemaCatalogManager(ILogger<CinemaCatalogManager> logger, ILocalCinemaRepo localCinemaRepo, IUnitOfWork unitOfWork,HttpClient httpClient,IOptions<KeyManager> keys)
         {
-            _cinemaCatalogManger = cinemaCatalogManger;
+            _localCinemaRepo = localCinemaRepo;
             _logger = logger;
             _unitOfWork = unitOfWork;
+            _keyManager = keys.Value;
         }
 
-        public asyn Task<bool> GetImdbClientAsync(string id)
+        public async Task<bool> GetImdbClientAsyncId(string id)
         {
-            throw new NotImplementedException();
+            var httpResponse = await _httpClient.GetAsync($"{_keyManager.Uri}/?i={id}&apikey={_keyManager.AccessToken}");
+            if (!httpResponse.IsSuccessStatusCode)
+                return false;
+            else
+                return true;
         }
 
         public async Task<OperationResult> UpdateMoviePriceAndTime(string id, UpdateMovieCatalog command)
@@ -48,7 +59,7 @@ namespace LocalCinema.Core.Services
             {
                 try
                 {
-                    if (!(await _cinemaCatalogManger.GetImdbClientAsync(id)))
+                    if (!(await GetImdbClientAsyncId(id)))
                     {
                         var notFoundError = new OperationError(ErrorCodes.NotFound,
                             $"Invalid title was provided: {id}");
@@ -57,7 +68,7 @@ namespace LocalCinema.Core.Services
                         return;
                     }
 
-                    await _cinemaCatalogManger.UpdateMoviePriceAndTime(id, command);
+                    await _localCinemaRepo.UpdateMoviePriceAndTime(id, command);
 
                     Commit();
                 }

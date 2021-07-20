@@ -14,4 +14,17 @@ namespace LocalCinema.Data.Model
         [Required]
         public Decimal Price { get; set; }
     }
+
+    public class KeyManager { 
+    
+        public string Uri { get; set; }
+
+        public string AccessToken { get; set; }
+    }
+    public class MovieTimeSlots
+    {
+        public string MovieName { get; set; }
+
+        public DateTime DateTime { get; set; }
+    }
 }

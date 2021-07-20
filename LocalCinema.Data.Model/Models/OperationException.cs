@@ -33,6 +33,7 @@ namespace LocalCinema.Data.Model
     }
     public class OperationResult
     {
+        public dynamic Data { get; set; }
         public ICollection<OperationError> Errors { get; }
         public ICollection<ValidationResult> ValidationError { get; }
 

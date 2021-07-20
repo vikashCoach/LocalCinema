@@ -19,6 +19,7 @@ namespace LocalCinema.Data.Repository
             _dbConnectionContext = dbConnectionContext;
         }
 
+
         public async Task ExecuteWithTransactionAsync(Func<IDbConnection, Action, Action,Task> unitOfWork,
             IsolationLevel isolationLevel = IsolationLevel.ReadCommitted)
         {

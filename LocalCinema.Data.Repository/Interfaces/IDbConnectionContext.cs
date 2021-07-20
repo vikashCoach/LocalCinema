@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LocalCinema.Data.Model;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
@@ -30,5 +31,10 @@ namespace LocalCinema.Data.Repository.Interfaces
         /// <returns></returns>
         Task ExecuteWithTransactionAsync(Func<IDbConnection, Action, Action, Task> unitOfWork,
             IsolationLevel isolationLevel = IsolationLevel.ReadCommitted);
+    }
+    public interface ILocalCinemaRepo
+    {
+        Task UpdateMoviePriceAndTime(string id, UpdateMovieCatalog updateMovieCatalog);
+        Task<OperationResult> GetMovieTimes(string movieName, string date);
     }
 }
